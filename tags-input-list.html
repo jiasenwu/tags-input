@@ -21,7 +21,7 @@
       <div class="tags">
         <template is="dom-repeat" items="[[tags]]" as="tag">
           <div class="tag">
-            <span>[[_getTagName(tag)]]</span>
+            <span>[[tag]]</span>
             <iron-icon
               tabindex="0"
               hidden$="[[noEdit]]"
@@ -32,8 +32,8 @@
           </div>
         </template>
       </div>
-      <vaadin-combo-box-light id="combo" item-label-path="[[itemLabel]]" item-value-path="[[itemValue]]" items="[[options]]"
-      selected-item="{{selectedItem}}">
+      <vaadin-combo-box-light allow-custom-value id="combo" item-label-path="[[itemLabel]]" item-value-path="[[itemValue]]" items="[[optionsCB]]"
+      selected-item="{{selectedItem}}" on-custom-value-set=_setNewTag>
         <div class="input-container">
           <paper-input
             id="input"
@@ -68,6 +68,10 @@
             type: Array,
             value: []
           },
+          optionsCB: {
+            type: Array,
+            computed: '_toComboBoxItems(options)'
+          },
           /**
           * Selected item
           */
@@ -92,6 +96,17 @@
         };
       }
 
+      _toComboBoxItems(options) {
+        let optionsCB = []
+        options.forEach(tag => {
+            optionsCB.push({
+            "value": tag,
+            "label": tag,
+          })
+        });
+        return optionsCB
+      }
+
       /**
        * Add a tag to the internal array.
        */
@@ -105,9 +120,9 @@
        */
       _removeTag(e) {
         const { index } = e.model;
-        const currObject = this.tags[index];
+        const tag = this.tags[index]
         this.remove(index);
-        this.push('options', currObject);
+        this.push('options', tag);
         this.focus();
       }
 
@@ -119,22 +134,20 @@
           // Get the selected value
           const value = this.$.combo._getItemValue(this.selectedItem);
           // Add name to array
-          this.add(newValue);
+          this.add(newValue.value);
           // Remove seleted item, to reset input
           this.selectedItem = null;
           // Reset input value
           this.tag = '';
           // Remove selected option from array
-          this.options = this.options.filter(n => n.value != value)
+          this.options = this.options.filter(n => n != value)
         }
       }
 
-      /**
-      * Print tag name with given label name
-      */
-      _getTagName(tag) {
-        const { itemLabel } = this;
-        return tag[itemLabel];
+      _setNewTag(e) {
+        e.preventDefault();
+        this.add(e.detail);
+        this.tag = '';
       }
     }
     customElements.define(TagsInputList.is, TagsInputList);
