@@ -32,7 +32,7 @@
           </div>
         </template>
       </div>
-      <vaadin-combo-box-light allow-custom-value id="combo" item-label-path="[[itemLabel]]" item-value-path="[[itemValue]]" items="[[optionsCB]]"
+      <vaadin-combo-box-light allow-custom-value id="combo" item-label-path="[[itemLabel]]" item-value-path="[[itemValue]]" items="[[_toComboBoxItems(options)]]"
       selected-item="{{selectedItem}}" on-custom-value-set=_setNewTag>
         <div class="input-container">
           <paper-input
@@ -67,10 +67,6 @@
           options: {
             type: Array,
             value: []
-          },
-          optionsCB: {
-            type: Array,
-            computed: '_toComboBoxItems(options)'
           },
           /**
           * Selected item
@@ -123,6 +119,8 @@
         const tag = this.tags[index]
         this.remove(index);
         this.push('options', tag);
+        // combo.items are not refreshed automatically.
+        this.$.combo.items = this._toComboBoxItems(this.options);
         this.focus();
       }
 
