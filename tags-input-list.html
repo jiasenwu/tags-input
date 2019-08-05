@@ -41,7 +41,10 @@
             no-label-float
             label="[[_label]]"
             autofocus$="[[autofocus]]"
-            value="{{tag}}">
+            value="{{tag}}"
+            auto-validate 
+            pattern="[a-zA-Z0-9_-]*" 
+            error-message="valid characters set: [a-zA-Z0-9_-]">
           </paper-input>
         </div>
       </vaadin-combo-box-light>
@@ -144,6 +147,8 @@
 
       _setNewTag(e) {
         e.preventDefault();
+        if (this.$.input.invalid) 
+            return
         this.add(e.detail);
         this.tag = '';
       }
